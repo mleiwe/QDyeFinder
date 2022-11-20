@@ -1,13 +1,13 @@
 function [cData,Scale,dim]=mnl_ProcessImageForNeurolucidaImages
 %The first step of the Neurolucida Imaging
-%Initially this will be based on the Pipeline_Neurolucida_Analysis3. But
-%the chromatic abberation methodology will be improved soon. Additionally
-%unmixing code from Satoshi Fujimoto will potentially be inserted here too
+
 % Inputs
 % User prompts to define images and other properties
 %
 % Outputs
 % -cData - The 4D image that has been corrected for chromatic abberation
+% -Scale - The XYZ scale 
+% -dim - The dimensions of the image.
 %
 % What to do next? First save all the outputs. Then auto trace the image in
 % Neurolucida save the .xml file then run the code
@@ -21,7 +21,7 @@ function [cData,Scale,dim]=mnl_ProcessImageForNeurolucidaImages
 %mnl_MakeMaxNormalisedMIPs(Data,100);%Makes MIPs normalised to the Max value
 %NB pick which one you need
 %% Chromatic Abberation
-prompt='Do you want to correct for chromatic abberations? y/n';
+prompt='Do you want to correct for chromatic aberations? y/n';
 Cacorr=input(prompt,'s');
 if strcmp(Cacorr,'y')==1
     %Tell the laser for each channel

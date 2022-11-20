@@ -132,7 +132,7 @@ end
 %Step 3c - Now remove the colour inconsistent long traces
 LengthThresh=1000; %The length at which to begin checking
 % LengthThresh=30; %The length at which to begin checking
-InconsistentColourThresh=0.5;
+InconsistentColourThresh=0.3;
 
 [fTrace]=mnl_DoubleCheckLongTraceConsistency_v3(Trace,lim,LengthThresh,cData,BkgMedian,MaxValues,Scale,InconsistentColourThresh);
 

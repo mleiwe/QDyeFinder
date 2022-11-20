@@ -32,7 +32,7 @@ function [Somas,BkgMean,BkgStd,Thresh]=mnl_ProcessTracesFromNeurolucida_Somas(fn
 %[Trace,Somas]=mnl_ReadXML_DendritesAndSomas(fname);
 [Somas]=mnl_ReadXML_Somas_v2(fname);
 %% Step 2 -  Filter to Remove channels
-[BadChannels,SampleBkgVxList,SampleVx]=mnl_FilterChannels_Somas(Somas,Data,Scale)
+[BadChannels,SampleBkgVxList,SampleVx]=mnl_FilterChannels_Somas(Somas,Data,Scale);
 %Remove Channels
 if isempty(BadChannels)==0
     AllChans=1:dim(3);
