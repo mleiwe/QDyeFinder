@@ -53,16 +53,3 @@ for i = 1:N
     [~, idx] = min(distances);
     cluster_labels(i) = idx;
 end
-
-% Plot the resulting clusters (if 2D data)
-if D == 2
-    colors = lines(length(cluster_centers));
-    figure;
-    hold on;
-    for i = 1:N
-        scatter(data(i,1), data(i,2), [], colors(cluster_labels(i),:), 'filled');
-    end
-    plot(cluster_centers(:,1), cluster_centers(:,2), 'kx', 'MarkerSize', 12, 'LineWidth', 2);
-    hold off;
-end
-end
