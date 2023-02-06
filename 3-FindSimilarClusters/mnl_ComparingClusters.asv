@@ -293,14 +293,14 @@ text(mRecall(maxI(1))-0.7,mPrecision(maxI(1)),"Optimum Threshold for K Plus Clus
 %DBScan
 cVal=5;
 for i=1:nRows
-    plot(Recall_DBScan(i,:),Precision_DBScan(i,:),"Color",cmap(cVal,:),'LineWidth',0.25)
+    plot(Recall_KPluss(i,:),Precision_KPlus(i,:),"Color",cmap(cVal,:),'LineWidth',0.25)
     hold on
 end
-mRecall=mean(Recall_DBScan,1,'omitnan');
-mPrecision=mean(Precision_DBScan,1,'omitnan');
-PR_Line_DBScan=plot(mRecall,mPrecision,'Color',cmap(cVal,:),'LineWidth',2);
+mRecall=mean(Recall_KPlus,1,'omitnan');
+mPrecision=mean(Precision_KPlus,1,'omitnan');
+PR_Line_KPlus=plot(mRecall,mPrecision,'Color',cmap(cVal,:),'LineWidth',2);
 scatter(mRecall(maxI(1)),mPrecision(maxI(1)),20,cmap(cVal));
-text(mRecall(maxI(1))-0.7,mPrecision(maxI(1)),"Optimum Threshold forDBScan (via F1 score) --->")
+text(mRecall(maxI(1))-0.7,mPrecision(maxI(1)),"Optimum Threshold for K Plus Clustering (via F1 score) --->")
 
 %Details for graph
 title('Precision Recall curves')
@@ -308,4 +308,3 @@ xlim([0 1])
 xlabel('Recall')
 ylim([0 1])
 ylabel('Precision')
-legend([PR_Line_dCrawler,PR_Line,MeanShiftCluster,PR_Line_MeanShiftCluster,PR_Line_Kmeans,PR_Line_KPlus,PR_Line_DBScan],{'dCrawler','Mean Shift Clustering','K means','K Plus','DBScan'})
