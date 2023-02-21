@@ -10,11 +10,11 @@ for i=1:nTrace
     if isnan(efPxTrace(i).VecNormMean)
         InputValues=zeros(1,nXFP);
     else
-        InputValues=Trace(i).VecNormMean;
+        InputValues=efPxTrace(i).VecNormMean;
     end
     InputMatrix(i,:)=InputValues;
     %Add the number of voxels as the weight
-    InputWeights(i,1)=Trace(i).NormMeanMagnitude;
+    InputWeights(i,1)=efPxTrace(i).NormMeanMagnitude;
     clear InputValues
 end
 
@@ -24,7 +24,21 @@ szTh=size(EuThreshVals,2);
 n=1;
 for i=1:szTh
     EuThresh=EuThreshVals(i);
+    %Clustering Algorithm
     [ClusterIDs,Centroids]=mnl_WeightedEuclideanCrawler_v2(InputMatrix,InputWeights,EuThresh);
+    %Create the Clusters Structure
+    Clusters=struct('Traces',[],'Centroid',[]);
+    maxClusterID=max(ClusterIDs);
+    for i=1:maxClusterID
+        %Has the cluster been merged?
+        if ~isnan(Centroids(i,:))
+            Rows=find(ClusterIDs==i);
+            Clusters(i).Traces=Rows;
+            Clusters(i).Centroid=Centroids(i,:);
+        end
+    end
+    ClusterNum=maxClusterID;
+    InitialClusterNum=ClusterNum;
     %Evaluate Per Cell
     [~,F1score_dCrawler(:,n),Recall_dCrawler(:,n),Precision_dCrawler(:,n),TruePositiveRate_dCrawler(:,n),FalsePositiveRate_dCrawler(:,n)]=mnl_EvaluateClassifierPerCell(efPxTrace,ClusterIDs,Clusters,dim,'n',EuThreshVals(i),1);
     Setting_dCrawler(n,1)=EuThresh;
