@@ -68,7 +68,7 @@ ClusteringMetrics(1).OptimumSettings_MedianIndex = maxI;
 %% 
 % Evaluate mean shift cluster
 % %Mean Shift Cluster tuning
-vec = [0.01,0.025,0.05,0.075,0.1,0.15,0.2,0.25];
+vec = 0.01:0.01:0.5;
 Bandwidths = vec;
 szTh = size(Bandwidths,2);
 n=1;
