@@ -1,5 +1,6 @@
-function mnl_ComparingClusters(efPxTrace)
-
+function [ClusteringMetrics]=mnl_ComparingClusters(efPxTrace)
+%set the random seed
+rng(1)
 %% Extract the imput matrix and weights (magnitude)
 dim=efPxTrace(1).dim;
 nTrace=size(efPxTrace,2);
@@ -19,6 +20,7 @@ for i=1:nTrace
 end
 
 %% Evaluate the dCrawler
+fprintf("Evaluating dCrawler\n")
 EuThreshVals=0.05:0.01:1;
 szTh=size(EuThreshVals,2);
 n=1;
@@ -66,11 +68,11 @@ ClusteringMetrics(1).OptimumSettings_MedianIndex = maxI;
 %% 
 % Evaluate mean shift cluster
 % %Mean Shift Cluster tuning
-vec = [0.01,0.025,0.05,0.075];
+vec = [0.01,0.025,0.05,0.075,0.1,0.15,0.2,0.25];
 Bandwidths = vec;
 szTh = size(Bandwidths,2);
 n=1;
-
+fprintf("Evaluating Mean Shift Clustering\n")
 for i=1:szTh
     Bandwidth = Bandwidths(i);
     %Meanshift
@@ -89,6 +91,7 @@ for i=1:szTh
     [~,F1score_MeanShift(:,n),Recall_MeanShift(:,n),Precision_MeanShift(:,n),TruePositiveRate_MeanShift(:,n),FalsePositiveRate_MeanShift(:,n)]=mnl_EvaluateClassifierPerCell(efPxTrace,ClusterIDs,Clusters,dim,'n',Bandwidths(i),2);
     Setting_MeanShift(n,1)=Bandwidth;
     n=n+1;
+    %mnl_InsertProgressTrackerInLoops(i,szTh)
 end
 
 %Now find the optimum thresh from the mean and median
@@ -112,6 +115,7 @@ ClusteringMetrics(2).OptimumSettings_Median=OptThreshMedian;
 ClusteringMetrics(2).OptimumSettings_MeanIndex = I;
 ClusteringMetrics(2).OptimumSettings_MedianIndex = maxI;
 %% K means 
+fprintf("Evaluating k Means Clustering\n")
 % K means Cluster tuning
 KMeansKVals=1:200;
 szK=size(KMeansKVals,2);
@@ -158,6 +162,7 @@ ClusteringMetrics(3).OptimumSettings_MeanIndex = I;
 ClusteringMetrics(3).OptimumSettings_MedianIndex = maxI;
 
 %% Evaluate DBSCAN
+fprintf("Evaluating DBScan\n")
 % DBScan tuning
 EpsVals=0.05:0.05:5;
 MinPtsVals=1;
@@ -321,8 +326,15 @@ cVal=1;
 % end
 mRecall=mean(Recall_dCrawler,1,'omitnan');
 mPrecision=mean(Precision_dCrawler,1,'omitnan');
+[smRecall,I]=sort(mRecall);%sort FPR
+smPrecision=mPrecision(I);%sort Precision by Recall values
+AUC=round(trapz([0 smRecall],[1 smPrecision]),3);
+ClusteringMetrics(cVal).AUC_PR=AUC;
+
 PR_Line_dCrawler=plot(mRecall,mPrecision,'Color',cmap(cVal,:),'LineWidth',2);
 hold on
+str=sprintf('%s%s','AUC-dCrawler = ',num2str(AUC));
+text(0.8,0.1*cVal,str)
 scatter(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),20,cmap(cVal));
 text(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex)-0.7,mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),"Optimum Threshold for dCrawler (via F1 score) --->")
 
@@ -334,7 +346,14 @@ cVal=2;
 % end
 mRecall=mean(Recall_MeanShift,1,'omitnan');
 mPrecision=mean(Precision_MeanShift,1,'omitnan');
+[smRecall,I]=sort(mRecall);%sort FPR
+smPrecision=mPrecision(I);%sort Precision by Recall values
+AUC=round(trapz([0 smRecall],[1 smPrecision]),3);
+ClusteringMetrics(cVal).AUC_PR=AUC;
+
 PR_Line_MeanShiftCluster=plot(mRecall,mPrecision,'Color',cmap(cVal,:),'LineWidth',2);
+str=sprintf('%s%s','AUC-Mean Shift Clustering = ',num2str(AUC));
+text(0.8,0.1*cVal,str)
 scatter(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),20,cmap(cVal));
 text(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex)-0.7,mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),"Optimum Threshold for Mean Shift Clustering (via F1 score) --->")
 
@@ -346,7 +365,14 @@ cVal=3;
 % end
 mRecall=mean(Recall_KMeans,1,'omitnan');
 mPrecision=mean(Precision_KMeans,1,'omitnan');
+[smRecall,I]=sort(mRecall);%sort FPR
+smPrecision=mPrecision(I);%sort Precision by Recall values
+AUC=round(trapz([0 smRecall],[1 smPrecision]),3);
+ClusteringMetrics(cVal).AUC_PR=AUC;
+
 PR_Line_KMeans=plot(mRecall,mPrecision,'Color',cmap(cVal,:),'LineWidth',2);
+str=sprintf('%s%s','AUC-K means = ',num2str(AUC));
+text(0.8,0.1*cVal,str)
 scatter(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),20,cmap(cVal));
 text(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex)-0.7,mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),"Optimum Threshold for K Means Clustering (via F1 score) --->")
 
@@ -370,7 +396,14 @@ cVal=4;
 % end
 mRecall=mean(Recall_DBSCAN,1,'omitnan');
 mPrecision=mean(Precision_DBSCAN,1,'omitnan');
+[smRecall,I]=sort(mRecall);%sort FPR
+smPrecision=mPrecision(I);%sort Precision by Recall values
+AUC=round(trapz([0 smRecall],[1 smPrecision]),3);
+ClusteringMetrics(cVal).AUC_PR=AUC;
+
 PR_Line_DBScan=plot(mRecall,mPrecision,'Color',cmap(cVal,:),'LineWidth',2);
+str=sprintf('%s%s','AUC-DBScan = ',num2str(AUC));
+text(0.8,0.1*cVal,str)
 scatter(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),20,cmap(cVal));
 text(mRecall(ClusteringMetrics(cVal).OptimumSettings_MedianIndex)-0.7,mPrecision(ClusteringMetrics(cVal).OptimumSettings_MedianIndex),"Optimum Threshold forDBScan (via F1 score) --->")
 

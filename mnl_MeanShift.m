@@ -17,11 +17,21 @@ centroids = NaN(1,p);
 for i=1:n
     x_i = X(i,:);
     shift = Inf;
-    while norm(shift) > eps
+    max_iterations = 50000;
+    iteration_count = 0; % Initialize counter
+    while norm(shift) > eps && iteration_count < max_iterations
         dist = pdist2(X,x_i);
         kernel = exp(-(dist.^2)/(2*bandwidth^2));
         shift = sum(bsxfun(@times, kernel, X), 1) / sum(kernel) - x_i;
         x_i = x_i+shift;
+        % Warning about no convergence
+        a =  iteration_count + 1;
+        if a >= max_iterations
+            tr_num = sprintf('%s%d', 'Trace Num ',i);
+            bw_str = sprintf('%s%d', 'Bandwidth - ',round(bandwidth,3));
+            fprintf('No convergence found after %d iterations at %s for %s\n',max_iterations,bw_str,tr_num);
+        end
+        iteration_count = iteration_count + 1; % Increase counter
     end
 
     if isnan(centroids(1,:))
