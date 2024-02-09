@@ -63,10 +63,10 @@ ClusteringMetrics(1).OptimumSettings_Mean=OptThresh; %Defaults to the lowest val
 ClusteringMetrics(1).OptimumSettings_Median=OptThreshMedian; %Defaults to the lowest value
 %% Evaluate mean shift cluster
 %Mean Shift Cluster tuning
-Bandwidths = 0.05;0.01;1;
+Bandwidths = 0.05:0.1;1;
 szTh = size(Bandwidths,2);
 n=1;
-
+fprintf("Mean Shift Clustering \n")
 for i=1:szTh
     Bandwidth = Bandwidths(i);
     %Meanshift
@@ -82,9 +82,10 @@ for i=1:szTh
     ClusterNum=maxClusterID;
     InitialClusterNum=ClusterNum;
     %Evaluate per cell
-    [~,F1score_MeanShift(:,n),Recall_MeanShift(:,n),Precision_MeanShift(:,n),TruePositiveRate_MeanShift(:,n),FalsePositiveRate_MeanShift(:,n)]=mnl_EvaluateClassifierPerCell(efPxTrace,ClusterIDs,Clusters,dim,'n',Bandwidths(i),2);
-    Setting_MeanShift(n,1)=Bandwidth;
+    [~,F1score_MeanShiftCluster(:,n),Recall_MeanShiftCluster(:,n),Precision_MeanShiftCluster(:,n),TruePositiveRate_MeanShiftCluster(:,n),FalsePositiveRate_MeanShiftCluster(:,n)]=mnl_EvaluateClassifierPerCell(efPxTrace,ClusterIDs,Clusters,dim,'n',Bandwidths(i),2);
+    MeanShiftSettings(n,1)=Bandwidth;
     n=n+1;
+    mnl_InsertProgressTrackerInLoops(i,szTh)
 end
 
 %Now find the optimum thresh from the mean and median
