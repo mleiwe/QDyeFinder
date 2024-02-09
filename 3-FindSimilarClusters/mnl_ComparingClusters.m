@@ -29,12 +29,12 @@ for i=1:szTh
     %Create the Clusters Structure
     Clusters=struct('Traces',[],'Centroid',[]);
     maxClusterID=max(ClusterIDs);
-    for i=1:maxClusterID
+    for j=1:maxClusterID
         %Has the cluster been merged?
-        if ~isnan(Centroids(i,:))
+        if ~isnan(Centroids(j,:))
             Rows=find(ClusterIDs==i);
-            Clusters(i).Traces=Rows;
-            Clusters(i).Centroid=Centroids(i,:);
+            Clusters(j).Traces=Rows;
+            Clusters(j).Centroid=Centroids(i,:);
         end
     end
     ClusterNum=maxClusterID;
