@@ -1,4 +1,4 @@
-function [cluster_labels, cluster_centers] = mean_shift(data, bandwidth)
+function [cluster_labels, cluster_centers] = MeanShiftClustering(data, bandwidth)
 % Inputs:
 %   data: NxD matrix of N data points in D dimensions
 %   bandwidth: bandwidth parameter for mean-shift
